@@ -1,7 +1,10 @@
-JUEGO DE MUNICIPIOS DE LA RIOJA – VERSION 1.2
+JUEGO DE MUNICIPIOS DE LA RIOJA – VERSIÓN 1.3
 
-Esta versión incorpora las 174 fotografías DENTRO del propio index.html.
-Así no depende de rutas de imágenes ni de la carpeta imagenes y evita errores de carga en GitHub Pages.
+Novedades:
+- Selección de 10, 25, 50 o 174 preguntas.
+- Las preguntas se seleccionan al azar.
+- Récord de aciertos guardado en el navegador para cada modalidad.
+- Pantalla final mejorada con porcentaje y récord.
+- Las 174 fotografías siguen integradas en index.html para evitar problemas de rutas y nombres.
 
-Para publicar: sustituir el index.html del repositorio y hacer commit/push con GitHub Desktop.
-No es necesario copiar ninguna carpeta de imágenes.
+Publicación: GitHub Pages.

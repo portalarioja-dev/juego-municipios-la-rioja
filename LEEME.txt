@@ -1,3 +1,7 @@
-Abre index.html con Chrome, Edge o Firefox. Juego con 174 fotografías, 174 municipios, orden aleatorio y 4 opciones por pregunta.
+JUEGO DE MUNICIPIOS DE LA RIOJA – VERSION 1.2
 
-Versión 1.1: nombres de archivo normalizados para evitar problemas de carga en GitHub Pages.
+Esta versión incorpora las 174 fotografías DENTRO del propio index.html.
+Así no depende de rutas de imágenes ni de la carpeta imagenes y evita errores de carga en GitHub Pages.
+
+Para publicar: sustituir el index.html del repositorio y hacer commit/push con GitHub Desktop.
+No es necesario copiar ninguna carpeta de imágenes.

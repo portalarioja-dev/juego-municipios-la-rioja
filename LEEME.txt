@@ -1,1 +1,3 @@
 Abre index.html con Chrome, Edge o Firefox. Juego con 174 fotografías, 174 municipios, orden aleatorio y 4 opciones por pregunta.
+
+Versión 1.1: nombres de archivo normalizados para evitar problemas de carga en GitHub Pages.

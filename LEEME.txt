@@ -1,9 +1,0 @@
-JUEGO DE MUNICIPIOS DE LA RIOJA – VERSIÓN 1.7
-
-Mejoras de esta versión:
-- Las preguntas se mezclan con un algoritmo de barajado más fiable.
-- No se repite ningún municipio dentro de una misma partida.
-- Las tres respuestas incorrectas se seleccionan procurando que tengan una longitud de nombre similar a la correcta, para evitar opciones demasiado evidentes.
-- Se mantiene la cabecera original proporcionada por el autor.
-- Se mantienen las 174 fotografías integradas en el juego.
-- Se mantienen las modalidades 10, 25, 50 y 174 preguntas y los récords.

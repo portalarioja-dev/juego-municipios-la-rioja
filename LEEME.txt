@@ -1,10 +1,12 @@
-JUEGO DE MUNICIPIOS DE LA RIOJA – VERSIÓN 1.3
+JUEGO DE MUNICIPIOS DE LA RIOJA - VERSION 1.4
 
-Novedades:
+Mejoras de esta versión:
+- Menú inicial renovado.
 - Selección de 10, 25, 50 o 174 preguntas.
-- Las preguntas se seleccionan al azar.
-- Récord de aciertos guardado en el navegador para cada modalidad.
-- Pantalla final mejorada con porcentaje y récord.
-- Las 174 fotografías siguen integradas en index.html para evitar problemas de rutas y nombres.
+- Récord independiente para cada modalidad, guardado en el navegador.
+- Pantalla final mejorada.
+- Botón para volver a jugar con el mismo desafío.
+- Botón para cambiar de desafío.
+- Las 174 fotografías siguen integradas en index.html.
 
 Publicación: GitHub Pages.

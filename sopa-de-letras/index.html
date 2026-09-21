@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sopa de Letras de La Rioja · Portal La Rioja</title>
+<!-- Sopa de Letras La Rioja v1.9 · corrección del tablero 23x23 -->
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#f4f7fb,#e7edf5);color:#18324b}
+.wrap{max-width:1100px;margin:auto;padding:18px}.card{background:#fff;border-radius:22px;box-shadow:0 8px 30px #0002;padding:22px}
+h1{text-align:center;margin:4px 0 8px;font-size:clamp(25px,4vw,40px)}.sub{text-align:center;color:#627488;margin-bottom:18px}
+.menu,.game,.final{display:none}.menu.active,.game.active,.final.active{display:block}
+.buttons{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:20px 0}.btn{border:0;border-radius:13px;padding:13px 22px;background:#245b88;color:white;font-weight:700;font-size:16px;cursor:pointer}.btn:hover{filter:brightness(1.08)}
+.info{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin:10px 0 18px;font-weight:700}.pill{background:#eef4f9;border-radius:999px;padding:8px 14px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;align-items:start}
+.grid{display:grid;grid-template-columns:repeat(var(--size),minmax(0,1fr));grid-template-rows:repeat(var(--size),minmax(0,1fr));width:min(100%,720px);aspect-ratio:1 / 1;height:auto;margin:auto;border:2px solid #cad6e2;border-radius:12px;overflow:hidden;background:#f8fbfd;touch-action:none;user-select:none}
+.cell{color:#18324b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(14px,2.1vw,22px);line-height:1;min-width:0;min-height:0;user-select:none;-webkit-user-select:none;cursor:pointer;border-right:1px solid #dce5ec;border-bottom:1px solid #dce5ec;touch-action:none}
+.cell.selected{background:#b8d8ef}.cell.found{background:#8fd0a9;color:#123}.cell.last{outline:3px solid #245b88;outline-offset:-3px}
+.cell.solution-missing{background:#fde7e7;color:#7c2d2d;box-shadow:inset 0 0 0 3px #d66}
+.cell.found.solution-missing{background:#8fd0a9;color:#123;box-shadow:inset 0 0 0 3px #d66}
+.solution-note{background:#fff5f5;border:1px solid #f0c7c7;border-radius:12px;padding:12px 14px;margin:12px auto 16px;max-width:900px;color:#7c2d2d;text-align:center;font-weight:700}
+.solution-grid{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;align-items:start}
+.solution-legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:8px 0 12px;font-size:14px;color:#526579}
+.legend-item{display:flex;align-items:center;gap:6px}.legend-box{width:18px;height:18px;border-radius:4px;border:2px solid #d66;background:#fde7e7}.legend-box.found{background:#8fd0a9}
+.solution-words{display:flex;flex-direction:column;gap:7px;max-height:700px;overflow:auto}.solution-word{padding:8px 10px;border-radius:9px;background:#fde7e7;font-weight:700;color:#7c2d2d}.solution-word.found{background:#dcefe3;color:#285b3e;text-decoration:line-through;opacity:.75}
+
+.words{display:flex;flex-direction:column;gap:7px;max-height:700px;overflow:auto}.word{padding:8px 10px;border-radius:9px;background:#f1f5f8;font-weight:700}.word.found{text-decoration:line-through;opacity:.5;background:#dcefe3}
+.help{text-align:center;color:#607387;font-size:14px;margin:14px 0}.final{text-align:center}.score{font-size:48px;font-weight:900;margin:10px}.small{color:#68798a}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.grid{width:min(94vw,650px);max-width:100%}.words{max-height:none;display:grid;grid-template-columns:repeat(2,1fr)}.word{font-size:13px}}
+</style></head><body><div class="wrap"><div class="card">
+<div id="menu" class="menu active"><h1>🔤 Sopa de Letras de La Rioja</h1><div class="sub">Encuentra los nombres de los municipios de La Rioja.</div>
+<div class="buttons"><button class="btn" onclick="startGame(10)">10 municipios</button><button class="btn" onclick="startGame(20)">20 municipios</button><button class="btn" onclick="startGame(30)">30 municipios</button></div>
+<p class="help">Los municipios aparecen en horizontal y vertical. Puedes encontrarlos en ambos sentidos.</p><div class="small" style="text-align:center;margin-top:8px">Listado de municipios contrastado con el Gobierno de La Rioja.</div></div>
+<div id="game" class="game"><h1>Sopa de Letras de La Rioja</h1><div class="info"><span class="pill">🔎 Encontrados: <b id="found">0</b>/<b id="total">0</b></span><span class="pill">⏱️ <b id="time">05:00</b></span><span class="pill">🏆 Récord: <b id="record">0</b></span></div>
+<div class="layout"><div><div id="grid" class="grid"></div><div class="help">Busca los municipios en horizontal o vertical. Arrastra desde la primera letra hasta la última, en cualquiera de los dos sentidos. También puedes pulsar primero una letra y después la última.</div></div><div><h3>Municipios a encontrar</h3><div id="words" class="words"></div></div></div>
+<div class="buttons"><button class="btn" onclick="backMenu()">CAMBIAR PARTIDA</button></div></div>
+<div id="solution" class="final">
+<h1>🔎 Solución de la partida</h1>
+<p class="solution-note" id="solutionNote"></p>
+<div class="solution-legend"><span class="legend-item"><span class="legend-box found"></span> Municipio encontrado</span><span class="legend-item"><span class="legend-box"></span> Municipio no encontrado</span></div>
+<div class="solution-grid"><div><div id="solutionGrid" class="grid"></div><div class="help">Aquí puedes ver dónde estaban los municipios que no habías encontrado.</div></div><div><h3>Resultado de la búsqueda</h3><div id="solutionWords" class="solution-words"></div></div></div>
+<div class="buttons"><button class="btn" onclick="showFinal()">VER PUNTUACIÓN</button></div>
+</div>
+<div id="final" class="final"><h1>🎉 ¡Partida terminada!</h1><div class="score" id="finalScore"></div><p id="finalMsg"></p><p class="small" id="finalTime"></p><div class="buttons"><button class="btn" onclick="startGame(currentN)">JUGAR DE NUEVO</button><button class="btn" onclick="backMenu()">CAMBIAR PARTIDA</button></div></div>
+</div></div>
+<script>
+const MUNICIPIOS=["Ábalos", "Agoncillo", "Aguilar del Río Alhama", "Ajamil de Cameros", "Albelda de Iregua", "Alberite", "Alcanadre", "Aldeanueva de Ebro", "Alesón", "Alesanco", "Alfaro", "Almarza de Cameros", "Anguciana", "Anguiano", "Arenzana de Abajo", "Arenzana de Arriba", "Arnedillo", "Arnedo", "Arrúbal", "Ausejo", "Autol", "Azofra", "Bañares", "Baños de Río Tobía", "Baños de Rioja", "Badarán", "Berceo", "Bergasa", "Bergasillas Bajera", "Bezares", "Bobadilla", "Briñas", "Brieva de Cameros", "Briones", "Cárdenas", "Cañas", "Cabezón de Cameros", "Calahorra", "Camprovín", "Canales de la Sierra", "Canillas de Río Tuerto", "Casalarreina", "Castañares de Rioja", "Castroviejo", "Cellorigo", "Cenicero", "Cervera del Río Alhama", "Cidamón", "Cihuri", "Cirueña", "Clavijo", "Cordovín", "Corera", "Cornago", "Corporales", "Cuzcurrita de Río Tirón", "Daroca de Rioja", "El Rasillo de Cameros", "El Redal", "El Villar de Arnedo", "Enciso", "Entrena", "Estollo", "Ezcaray", "Foncea", "Fonzaleche", "Fuenmayor", "Galbárruli", "Galilea", "Gallinero de Cameros", "Gimileo", "Grávalos", "Grañón", "Haro", "Herce", "Herramélluri", "Hervías", "Hormilla", "Hormilleja", "Hornillos de Cameros", "Hornos de Moncalvillo", "Huércanos", "Igea", "Jalón de Cameros", "Laguna de Cameros", "Lagunilla del Jubera", "Lardero", "Ledesma de la Cogolla", "Leiva", "Leza de Río Leza", "Logroño", "Lumbreras de Cameros", "Manjarrés", "Mansilla de la Sierra", "Manzanares de Rioja", "Matute", "Medrano", "Munilla", "Murillo de Río Leza", "Muro de Aguas", "Muro en Cameros", "Nájera", "Nalda", "Navajún", "Navarrete", "Nestares", "Nieva de Cameros", "Ocón", "Ochánduri", "Ojacastro", "Ollauri", "Ortigosa de Cameros", "Pazuengos", "Pedroso", "Pinillos", "Préjano", "Pradejón", "Pradillo", "Quel", "Rabanera", "Ribafrecha", "Rincón de Soto", "Robres del Castillo", "Rodezno", "Sajazarra", "San Asensio", "San Millán de Yécora", "San Millán de la Cogolla", "San Román de Cameros", "San Torcuato", "San Vicente de la Sonsierra", "Santa Coloma", "Santa Engracia del Jubera", "Santa Eulalia Bajera", "Santo Domingo de la Calzada", "Santurde de Rioja", "Santurdejo", "Sojuela", "Sorzano", "Sotés", "Soto en Cameros", "Terroba", "Tirgo", "Tobía", "Tormantos", "Torre en Cameros", "Torrecilla en Cameros", "Torrecilla sobre Alesanco", "Torremontalbo", "Treviana", "Tricio", "Tudelilla", "Uruñuela", "Valdemadera", "Valgañón", "Ventosa", "Ventrosa", "Viguera", "Villalba de Rioja", "Villalobar de Rioja", "Villamediana de Iregua", "Villanueva de Cameros", "Villar de Torre", "Villarejo", "Villarroya", "Villarta-Quintana", "Villavelayo", "Villaverde de Rioja", "Villoslada de Cameros", "Viniegra de Abajo", "Viniegra de Arriba", "Zarratón", "Zarzosa", "Zorraquín"];
+let SIZE=22;
+let currentN=10, selectedWords=[], placements=[], grid=[], timer=null, seconds=300, found=0;
+let selecting=false, startCell=null, currentCell=null, moved=false, clickStart=null;
+const norm=s=>s.toUpperCase().replace(/Ñ/g,'§ENYE§').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/§ENYE§/g,'Ñ').replace(/[^A-ZÑ]/g,'');
+const dirs=[[0,1],[1,0]]; // Solo horizontal y vertical; las palabras se colocan siempre en sentido normal
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function cssId(name){return 'w-'+CSS.escape(name)}
+function gridSizeFor(n){return n===10?15:n===20?18:23}
+function build(){
+  grid=Array.from({length:SIZE},()=>Array(SIZE).fill(''));
+  placements=[];
+  const candidates=shuffle(selectedWords.map(name=>({name,w:norm(name)}))).sort((a,b)=>b.w.length-a.w.length);
+  for(const o of candidates){
+    let placed=false;
+    for(let attempt=0;attempt<5000&&!placed;attempt++){
+      const d=dirs[Math.floor(Math.random()*dirs.length)];
+      const r=Math.floor(Math.random()*SIZE), c=Math.floor(Math.random()*SIZE);
+      const endR=r+d[0]*(o.w.length-1), endC=c+d[1]*(o.w.length-1);
+      if(endR<0||endR>=SIZE||endC<0||endC>=SIZE) continue;
+      let ok=true;
+      for(let i=0;i<o.w.length;i++){
+        const rr=r+d[0]*i,cc=c+d[1]*i;
+        if(grid[rr][cc] && grid[rr][cc]!==o.w[i]){ok=false;break}
+      }
+      if(ok){
+        for(let i=0;i<o.w.length;i++) grid[r+d[0]*i][c+d[1]*i]=o.w[i];
+        placements.push({name:o.name,w:o.w,r,c,endR,endC});
+        placed=true;
+      }
+    }
+    // Si por casualidad no cupiera, volvemos a construir la partida con otra selección.
+    if(!placed) return false;
+  }
+  const LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++)if(!grid[r][c])grid[r][c]=LETTERS[Math.floor(Math.random()*LETTERS.length)];
+  return true;
+}
+function render(){
+  const g=document.getElementById('grid');
+  g.style.setProperty('--size',SIZE); g.innerHTML='';
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    const d=document.createElement('div'); d.className='cell'; d.textContent=grid[r][c]; d.dataset.r=r; d.dataset.c=c;
+    g.appendChild(d);
+  }
+  const w=document.getElementById('words'); w.innerHTML='';
+  selectedWords.forEach(x=>{const d=document.createElement('div');d.className='word';d.id=cssId(x);d.textContent=x;w.appendChild(d)});
+  document.getElementById('total').textContent=selectedWords.length;
+  document.getElementById('found').textContent=found;
+  document.getElementById('record').textContent=localStorage.getItem('sopaRecord'+currentN)||0;
+  g.onpointerdown=pointerDown;
+  document.onpointermove=pointerMove;
+  document.onpointerup=pointerUp;
+  document.onpointercancel=cancelSelection;
+}
+function cellFromPoint(x,y){
+  const el=document.elementFromPoint(x,y);
+  return el && el.classList.contains('cell') ? {r:+el.dataset.r,c:+el.dataset.c} : null;
+}
+function gCapture(cell,id){try{cell.setPointerCapture(id);return true}catch(_){return false}}
+function pointerDown(e){
+  const cell=e.target.closest('.cell'); if(!cell)return;
+  selecting=true; moved=false; startCell={r:+cell.dataset.r,c:+cell.dataset.c}; currentCell=startCell;
+  if(e.pointerId!==undefined && gCapture(cell,e.pointerId)){}
+  clearMarks(); markCells([startCell],'last');
+  e.preventDefault();
+}
+function pointerMove(e){
+  if(!selecting)return;
+  const cell=cellFromPoint(e.clientX,e.clientY); if(!cell)return;
+  if(cell.r!==startCell.r||cell.c!==startCell.c)moved=true;
+  currentCell=cell; previewSelection(startCell,currentCell); e.preventDefault();
+}
+function pointerUp(e){
+  if(!selecting)return;
+  const cell=cellFromPoint(e.clientX,e.clientY) || currentCell;
+  selecting=false;
+  if(cell) currentCell=cell;
+  if(!moved && cell && startCell){
+    clearMarks();
+    if(clickStart){ checkSelection(clickStart,cell); clickStart=null; }
+    else { clickStart=cell; markCells([cell],'last'); }
+  }else if(startCell && currentCell){
+    checkSelection(startCell,currentCell); clickStart=null;
+  }
+  startCell=null; currentCell=null;
+}
+function cancelSelection(){selecting=false;startCell=null;currentCell=null;clearMarks()}
+function previewSelection(a,b){const cells=getLine(a,b);clearMarks();if(cells.length)markCells(cells,'last')}
+function getLine(a,b){
+  const sameRow=a.r===b.r, sameCol=a.c===b.c;
+  if(!sameRow && !sameCol)return [];
+  const dr=Math.sign(b.r-a.r), dc=Math.sign(b.c-a.c);
+  const len=Math.max(Math.abs(b.r-a.r),Math.abs(b.c-a.c))+1;
+  const cells=[];for(let i=0;i<len;i++)cells.push({r:a.r+dr*i,c:a.c+dc*i});
+  return cells;
+}
+function checkSelection(a,b){
+  const cells=getLine(a,b); if(!cells.length){clearMarks();return;}
+  const letters=cells.map(x=>grid[x.r][x.c]).join('');
+  const reversed=letters.split('').reverse().join('');
+  const p=placements.find(x=>!document.getElementById(cssId(x.name)).classList.contains('found')&&(letters===x.w||reversed===x.w));
+  clearMarks();
+  if(p){document.getElementById(cssId(p.name)).classList.add('found');markCells(cells,'found');found++;document.getElementById('found').textContent=found;if(found===selectedWords.length)finish(true);}
+}
+function markCells(cells,cls){cells.forEach(x=>{const e=document.querySelector(`.cell[data-r="${x.r}"][data-c="${x.c}"]`);if(e)e.classList.add(cls)})}
+function clearMarks(){document.querySelectorAll('.cell.last').forEach(e=>e.classList.remove('last'))}
+function startGame(n){
+  currentN=n; SIZE=gridSizeFor(n); found=0; clickStart=null; seconds=300;
+  const maxLen = n===10 ? 15 : n===20 ? 18 : 23;
+  const pool = MUNICIPIOS.filter(x=>norm(x).length<=maxLen);
+  let ok=false;
+  for(let tries=0;tries<100&&!ok;tries++){
+    selectedWords=shuffle([...pool]).slice(0,n);
+    ok=build();
+  }
+  if(!ok){alert('No se ha podido generar la partida. Pulsa de nuevo para intentarlo.');return;}
+  render();show('game');clearInterval(timer);timer=setInterval(()=>{seconds--;document.getElementById('time').textContent=fmt(seconds);if(seconds<=0)finish(false)},1000);document.getElementById('time').textContent=fmt(seconds);
+}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function finish(win){
+  clearInterval(timer);
+  let rec=+localStorage.getItem('sopaRecord'+currentN)||0;
+  if(found>rec){localStorage.setItem('sopaRecord'+currentN,found);rec=found}
+  document.getElementById('finalScore').textContent=found+' / '+selectedWords.length;
+  document.getElementById('finalMsg').textContent=win?'¡Has encontrado todos los municipios!':'Se acabó el tiempo.';
+  document.getElementById('finalTime').textContent='Tiempo restante: '+fmt(seconds)+' · Récord: '+rec;
+  showSolution(win);
+}
+function showSolution(win){
+  const g=document.getElementById('solutionGrid');
+  g.style.setProperty('--size',SIZE); g.innerHTML='';
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    const d=document.createElement('div'); d.className='cell'; d.textContent=grid[r][c]; d.dataset.r=r; d.dataset.c=c; g.appendChild(d);
+  }
+  const sw=document.getElementById('solutionWords'); sw.innerHTML='';
+  const foundNames=new Set(placements.filter(p=>document.getElementById(cssId(p.name)).classList.contains('found')).map(p=>p.name));
+  selectedWords.forEach(name=>{
+    const d=document.createElement('div');
+    d.className='solution-word'+(foundNames.has(name)?' found':'');
+    d.textContent=name;
+    sw.appendChild(d);
+  });
+  placements.forEach(p=>{
+    const isFound=foundNames.has(p.name);
+    const cells=getLine({r:p.r,c:p.c},{r:p.endR,c:p.endC});
+    if(!isFound) markCellsOn(g,cells,'solution-missing');
+  });
+  document.getElementById('solutionNote').textContent=win
+    ? '¡Has encontrado todos los municipios! Pulsa «VER PUNTUACIÓN» para continuar.'
+    : 'Los municipios que no habías encontrado aparecen marcados en rojo. Pulsa «VER PUNTUACIÓN» para ver tu resultado.';
+  show('solution');
+}
+function markCellsOn(root,cells,cls){cells.forEach(x=>{const e=root.querySelector(`.cell[data-r="${x.r}"][data-c="${x.c}"]`);if(e)e.classList.add(cls)})}
+function showFinal(){show('final')}
+function show(id){['menu','game','solution','final'].forEach(x=>document.getElementById(x).classList.remove('active'));document.getElementById(id).classList.add('active')}
+function backMenu(){clearInterval(timer);cancelSelection();clickStart=null;show('menu')}
+</script></body></html>
